@@ -25,8 +25,7 @@ class PlaceState(Enum):
 
 
 class Place:
-    def __init__(self, place_number, state=PlaceState.FREE, ticket_number=0, start_time=None):
-        self.place_number = place_number  # sequential number starting with 0
+    def __init__(self, state=PlaceState.FREE, ticket_number=0, start_time=None):
         self.state = state
         self.ticket_number = ticket_number  # registered ticket number
         self.start_time = start_time
@@ -35,8 +34,7 @@ class Place:
 # Initialize list_of_places
 list_of_places = []
 for i in range(numberOfPlaces):
-    place = Place(place_number=i)
-    list_of_places.append(place)
+    list_of_places.append(Place())
 
 # list_of_ticket_numbers is only used if ticket number could not be registered to a place
 list_of_ticket_numbers = []
@@ -174,24 +172,24 @@ def subscribe(client: mqtt_client):
                 for place in list_of_places:
                     if place.ticket_number == new_number:
                         print("New number " + str(new_number) +
-                              "already associated with " + str(place.place_number+1))
+                              " already registered")
                         return
                 if new_number in list_of_ticket_numbers:
                     print("New number " + str(new_number) +
                           "already in ticket number list")
                     return
-                for place in list_of_places:
+                for count, place in enumerate(list_of_places):
                     # Search an empty place
                     if (place.state == PlaceState.FREE):
                         # Found one - register ticket number to place
                         print("Register ticket: " +
-                              str(new_number) + " to place: " + str(place.place_number+1))
+                              str(new_number) + " to free place")
 
                         place.state = PlaceState.REGISTERED
                         place.ticket_number = new_number
-                        list_of_labels_to_display_place_number[place.place_number].config(
+                        list_of_labels_to_display_place_number[count].config(
                             bg="green")
-                        list_of_labels_to_display_ticket_number[place.place_number].config(
+                        list_of_labels_to_display_ticket_number[count].config(
                             text=place.ticket_number)
                         break
                     if (place == list_of_places[-1]):
