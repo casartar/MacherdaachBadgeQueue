@@ -6,14 +6,12 @@ from enum import Enum
 from datetime import datetime
 import statistics
 import sqlite3
+from config import broker, username, password
 
-broker = ""
 port = 1883
 topic_from_place = "macherdaach/queue/messageFromPlace"
 topic_from_controller = "macherdaach/queue/messageFromController"
 client_id = f'python-mqtt-{random.randint(0,1000)}'
-username = ''
-password = ''
 
 numberOfPlaces = 8
 
