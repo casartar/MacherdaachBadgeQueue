@@ -65,7 +65,7 @@ list_of_labels_to_display_queue = []
 
 # Initialize labels
 for place in range(numberOfPlaces):
-    label_to_display_ticket_number = Label(window, text="--")
+    label_to_display_ticket_number = Label(window, text=" Frei ")
     label_to_display_ticket_number.config(font=("Courier", 44))
     label_to_display_ticket_number.grid(
         row=((place//2)*2)+1, column=((place % 2)*3)+1)
@@ -114,22 +114,24 @@ def subscribe(client: mqtt_client):
         try:
             mqtt_decoded = str(msg.payload.decode("utf-8", "ignore"))
             json_loaded = json.loads(mqtt_decoded)
-
             if(msg.topic == topic_from_place):
                 # message received from place
                 if (json_loaded["place_occupied"] == True):
                     # Place was taken by the owner of the ticket_number
                     # Place number in MQTT-Message starts with 1 and must be decremented
-                    print("Occupied: " + str(json_loaded["place_number"]))
                     place_number = json_loaded["place_number"] - 1
-
-                    list_of_places[place_number].state = PlaceState.OCCUPIED
-                    list_of_labels_to_display_place_number[place_number].config(
-                        bg="red")
-                    list_of_labels_to_display_ticket_number[place_number].config(
-                        text="Belegt")
-                    list_of_places[place_number].start_time = datetime.now(
-                        tz=None)
+                    if(list_of_places[place_number].state == PlaceState.REGISTERED):
+                        print("Occupied: " + str(place_number))
+                        list_of_places[place_number].state = PlaceState.OCCUPIED
+                        list_of_labels_to_display_place_number[place_number].config(
+                            bg="red")
+                        list_of_labels_to_display_ticket_number[place_number].config(
+                            text="Belegt")
+                        list_of_places[place_number].start_time = datetime.now(
+                            tz=None)
+                    else:
+                        print(
+                            "Not occupied - there is no ticket registered to this place")
                 else:
                     # Place was given up by owner
                     print("Released: " +
@@ -157,8 +159,9 @@ def subscribe(client: mqtt_client):
                             # Take first element of list_of_ticket_numbers and register the number to the current place and display it
                             ticket_number = list_of_ticket_numbers.pop(0)
                             list_of_places[place_number].ticket_number = ticket_number
+                            list_of_places[place_number].state = PlaceState.REGISTERED
                             list_of_labels_to_display_ticket_number[place_number].config(
-                                text=ticket_number)
+                                text="%6d" % ticket_number)
                             update_queue()
 
             elif (msg.topic == topic_from_controller):
@@ -195,7 +198,8 @@ def subscribe(client: mqtt_client):
                         print("New number " + str(new_number))
                         list_of_ticket_numbers.append(new_number)
                         update_queue()
-        except:
+        except Exception as e:
+            print(str(e))
             print("Something went wrong on mqtt reception")
 
     client.subscribe(topic_from_place)
