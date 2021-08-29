@@ -25,9 +25,9 @@ class PlaceState(Enum):
 
 
 class Place:
-    def __init__(self, place_number, occupied, ticket_number, start_time):
+    def __init__(self, place_number, state=PlaceState.FREE, ticket_number=0, start_time=None):
         self.place_number = place_number  # sequential number starting with 0
-        self.state = PlaceState.FREE
+        self.state = state
         self.ticket_number = ticket_number  # registered ticket number
         self.start_time = start_time
 
@@ -35,8 +35,7 @@ class Place:
 # Initialize list_of_places
 list_of_places = []
 for i in range(numberOfPlaces):
-    place = Place(place_number=i, occupied=False,
-                  ticket_number=0, start_time=None)
+    place = Place(place_number=i)
     list_of_places.append(place)
 
 # list_of_ticket_numbers is only used if ticket number could not be registered to a place
@@ -145,17 +144,15 @@ def subscribe(client: mqtt_client):
                         print("Place is not in state OCCUPIED - can not be released")
 
                     else:
-                        list_of_places[place_number].state = PlaceState.FREE
-                        list_of_places[place_number].ticket_number = 0
-                        list_of_places[place_number].start_time = None
+                        processing_time = datetime.now(
+                            tz=None) - list_of_places[place_number].start_time
+                        list_of_places[place_number] = Place(place_number)
 
                         list_of_labels_to_display_place_number[place_number].config(
                             bg="green")
                         list_of_labels_to_display_ticket_number[place_number].config(
                             text="--")
                         # Save processing time in
-                        processing_time = datetime.now(
-                            tz=None) - list_of_places[place_number].start_time
                         print("Processing time: " + str(processing_time))
                         list_of_processing_times.append(processing_time)
                         # Search for a new number in list_of_ticket_numbers to be registered to the released place
@@ -255,7 +252,7 @@ def update_queue():
             else:
                 estimated_processing_time = median_processing_time - current_processing_time
                 element.config(text=str(list_of_ticket_numbers[count]) + "(" + str(
-                    int(estimated_processing_time.total_seconds()/60)) + "min)")
+                    int(estimated_processing_time.total_seconds()/60)) + " min)")
         else:
             element.config(text="--")
 
