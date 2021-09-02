@@ -23,7 +23,8 @@ This repo houses the Lötplatz-Zuweisungssystem for the Macherdaach 2021 in Land
 ```
 
 ### Place new ticket number in queue
-
+```
 {
   "ticket_number":1
 }
+```
