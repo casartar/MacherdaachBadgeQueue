@@ -13,12 +13,21 @@ This repo houses the Lötplatz-Zuweisungssystem for the Macherdaach 2021 in Land
 
 ## Sample MQTT Messages
 
-###Set state for a place
+### New user has arrived at place one and starts soldering
 
 ```
 {
   "place_number": 1,
   "place_occupied": true
+}
+```
+
+### User has finished soldering
+
+```
+{
+  "place_number": 1,
+  "place_occupied": false
 }
 ```
 
