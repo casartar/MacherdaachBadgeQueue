@@ -6,6 +6,7 @@ from enum import Enum
 from datetime import datetime
 import statistics
 import sqlite3
+import place
 from config import broker, username, password
 
 port = 1883
@@ -16,23 +17,12 @@ client_id = f'python-mqtt-{random.randint(0,1000)}'
 numberOfPlaces = 8
 
 
-class PlaceState(Enum):
-    FREE = 1  # This place is not used and there is no ticket number to register
-    REGISTERED = 2  # A ticket number was registered to this place but the owner has not started yet
-    OCCUPIED = 3  # The owner of the ticket number has started
-
-
-class Place:
-    def __init__(self, state=PlaceState.FREE, ticket_number=0, start_time=None):
-        self.state = state
-        self.ticket_number = ticket_number  # registered ticket number
-        self.start_time = start_time
 
 
 # Initialize list_of_places
 list_of_places = []
 for i in range(numberOfPlaces):
-    list_of_places.append(Place())
+    list_of_places.append(place.Place())
 
 # list_of_ticket_numbers is only used if ticket number could not be registered to a place
 list_of_ticket_numbers = []
@@ -122,13 +112,13 @@ def subscribe(client: mqtt_client):
                     place_number = json_loaded["place_number"] - 1
                     if(list_of_places[place_number].state == PlaceState.REGISTERED):
                         print("Occupied: " + str(place_number))
-                        list_of_places[place_number].state = PlaceState.OCCUPIED
+                        list_of_places[place_number].occupyPlace()
                         list_of_labels_to_display_place_number[place_number].config(
                             bg="red")
                         list_of_labels_to_display_ticket_number[place_number].config(
                             text="Belegt")
-                        list_of_places[place_number].start_time = datetime.now(
-                            tz=None)
+                        list_of_places[place_number].setstarttime(datetime.now(
+                            tz=None))
                     else:
                         print(
                             "Not occupied - there is no ticket registered to this place")
