@@ -1,4 +1,6 @@
 from tkinter import *
+
+import place as placepackage
 from paho.mqtt import client as mqtt_client
 import random
 import json
@@ -6,7 +8,6 @@ from enum import Enum
 from datetime import datetime
 import statistics
 import sqlite3
-import place
 from config import broker, username, password
 
 port = 1883
@@ -22,7 +23,7 @@ numberOfPlaces = 8
 # Initialize list_of_places
 list_of_places = []
 for i in range(numberOfPlaces):
-    list_of_places.append(place.Place())
+    list_of_places.append(placepackage.Place())
 
 # list_of_ticket_numbers is only used if ticket number could not be registered to a place
 list_of_ticket_numbers = []
@@ -36,6 +37,8 @@ list_of_processing_times = []
 window = Tk()
 window.geometry("1680x1050")
 window.title("Macherddach Badge Queue")
+
+
 
 # Initialize columns of layout
 window.columnconfigure(0, weight=2)  # Number of even places
@@ -110,7 +113,7 @@ def subscribe(client: mqtt_client):
                     # Place was taken by the owner of the ticket_number
                     # Place number in MQTT-Message starts with 1 and must be decremented
                     place_number = json_loaded["place_number"] - 1
-                    if(list_of_places[place_number].state == PlaceState.REGISTERED):
+                    if(list_of_places[place_number].state == placepackage.PlaceState.REGISTERED):
                         print("Occupied: " + str(place_number))
                         list_of_places[place_number].occupyPlace()
                         list_of_labels_to_display_place_number[place_number].config(
@@ -128,18 +131,16 @@ def subscribe(client: mqtt_client):
                           str(json_loaded["place_number"]))
                     place_number = json_loaded["place_number"] - 1
 
-                    if (list_of_places[place_number].state != PlaceState.OCCUPIED):
+                    if (list_of_places[place_number].state != placepackage.PlaceState.OCCUPIED):
                         print("Place is not in state OCCUPIED - can not be released")
 
                     else:
                         processing_time = datetime.now(
                             tz=None) - list_of_places[place_number].start_time
-                        list_of_places[place_number] = Place(place_number)
+                        list_of_places[place_number] = placepackage.Place(place_number)
 
                         list_of_labels_to_display_place_number[place_number].config(
-                            bg="green")
-                        list_of_labels_to_display_ticket_number[place_number].config(
-                            text="--")
+                            bg="green", text="--")
                         # Save processing time in
                         print("Processing time: " + str(processing_time))
                         list_of_processing_times.append(processing_time)
@@ -149,7 +150,7 @@ def subscribe(client: mqtt_client):
                             # Take first element of list_of_ticket_numbers and register the number to the current place and display it
                             ticket_number = list_of_ticket_numbers.pop(0)
                             list_of_places[place_number].ticket_number = ticket_number
-                            list_of_places[place_number].state = PlaceState.REGISTERED
+                            list_of_places[place_number].state = placepackage.PlaceState.REGISTERED
                             list_of_labels_to_display_ticket_number[place_number].config(
                                 text="%6d" % ticket_number)
                             update_queue()
@@ -171,12 +172,12 @@ def subscribe(client: mqtt_client):
                     return
                 for count, place in enumerate(list_of_places):
                     # Search an empty place
-                    if (place.state == PlaceState.FREE):
+                    if (place.state == placepackage.PlaceState.FREE):
                         # Found one - register ticket number to place
                         print("Register ticket: " +
                               str(new_number) + " to free place")
 
-                        place.state = PlaceState.REGISTERED
+                        place.state = placepackage.PlaceState.REGISTERED
                         place.ticket_number = new_number
                         list_of_labels_to_display_place_number[count].config(
                             bg="green")

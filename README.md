@@ -10,4 +10,30 @@ This repo houses the Lötplatz-Zuweisungssystem for the Macherdaach 2021 in Land
 3. Initialize with your favourite IDE
    1. Sample configuration for [PyCharm](https://www.jetbrains.com/help/pycharm/quick-start-guide.html): ![img.png](docs/img/img.png)
    2. ...
-   3. 
+
+## Sample MQTT Messages
+
+### New user has arrived at place one and starts soldering
+
+```
+{
+  "place_number": 1,
+  "place_occupied": true
+}
+```
+
+### User has finished soldering
+
+```
+{
+  "place_number": 1,
+  "place_occupied": false
+}
+```
+
+### Place new ticket number in queue
+```
+{
+  "ticket_number":1
+}
+```
