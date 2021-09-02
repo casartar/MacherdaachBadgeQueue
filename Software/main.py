@@ -137,12 +137,10 @@ def subscribe(client: mqtt_client):
                     else:
                         processing_time = datetime.now(
                             tz=None) - list_of_places[place_number].start_time
-                        list_of_places[place_number] = Place(place_number)
+                        list_of_places[place_number] = placepackage.Place(place_number)
 
                         list_of_labels_to_display_place_number[place_number].config(
-                            bg="green")
-                        list_of_labels_to_display_ticket_number[place_number].config(
-                            text="--")
+                            bg="green", text="--")
                         # Save processing time in
                         print("Processing time: " + str(processing_time))
                         list_of_processing_times.append(processing_time)
