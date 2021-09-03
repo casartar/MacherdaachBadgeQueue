@@ -1,13 +1,12 @@
-from tkinter import *
+from tkinter import Tk, Label
 
 import place as placepackage
 from paho.mqtt import client as mqtt_client
 import random
 import json
-from enum import Enum
 from datetime import datetime
 import statistics
-import sqlite3
+# import sqlite3
 from config import broker, username, password
 
 port = 1883
