@@ -4,7 +4,7 @@ class PlaceState():
     OCCUPIED = 3  # The owner of the ticket number has started
 
 
-class RegistrationError:
+class RegistrationError(Exception):
     pass
 
 
