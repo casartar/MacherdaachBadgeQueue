@@ -34,58 +34,58 @@ list_of_processing_times = []
 # database = "database.db"
 # connection = sqlite3.connect(database)
 
-window = Tk()
-window.geometry("1680x1050")
-window.title("Macherddach Badge Queue")
-
-
-
-# Initialize columns of layout
-window.columnconfigure(0, weight=2)  # Number of even places
-window.columnconfigure(1, weight=1)  # Shows if occupied and ticket number
-window.columnconfigure(2, weight=1)  # Empty
-window.columnconfigure(3, weight=2)  # Number of odd places
-window.columnconfigure(4, weight=1)  # Shows if occupied and ticket number
-window.columnconfigure(5, weight=1)  # Shows next couple of ticket numbers
-
-# Initialize rows of layout
-for place in range(numberOfPlaces+1):
-    window.rowconfigure(place, weight=1)
-
 list_of_labels_to_display_ticket_number = []
 list_of_labels_to_display_place_number = []
 list_of_labels_to_display_queue = []
 
-# Initialize labels
-for place in range(numberOfPlaces):
-    label_to_display_ticket_number = Label(window, text=" Frei ")
-    label_to_display_ticket_number.config(font=("Courier", 44))
-    label_to_display_ticket_number.grid(
-        row=((place//2)*2)+1, column=((place % 2)*3)+1)
-    list_of_labels_to_display_ticket_number.append(
-        label_to_display_ticket_number)
+window = Tk()
 
-    label_to_display_place_number = Label(
-        window, text="Platz " + str(place+1), bg="green")
-    label_to_display_place_number.config(font=("Courier", 44))
-    label_to_display_place_number.grid(
-        row=((place//2)*2)+1, column=((place % 2)*3))
-    list_of_labels_to_display_place_number.append(
-        label_to_display_place_number)
+def init_window():
+    window.geometry("1680x1050")
+    window.title("Macherddach Badge Queue")
 
-for i in range(numberOfPlaces):
-    element = Label(window, text="--")
-    element.config(font=("Courier", 20))
-    element.grid(row=i+1, column=5)
-    list_of_labels_to_display_queue.append(element)
+    # Initialize columns of layout
+    window.columnconfigure(0, weight=2)  # Number of even places
+    window.columnconfigure(1, weight=1)  # Shows if occupied and ticket number
+    window.columnconfigure(2, weight=1)  # Empty
+    window.columnconfigure(3, weight=2)  # Number of odd places
+    window.columnconfigure(4, weight=1)  # Shows if occupied and ticket number
+    window.columnconfigure(5, weight=1)  # Shows next couple of ticket numbers
 
-headline = Label(window, text="Macherdaach Badge Lötplatz-Zuweisungssystem")
-headline.config(font=("Courier", 32))
-headline.grid(row=0, column=0, columnspan=5)
+    # Initialize rows of layout
+    for place in range(numberOfPlaces+1):
+        window.rowconfigure(place, weight=1)
 
-queue_headline = Label(window, text="Queue")
-queue_headline.config(font=("Courier", 32))
-queue_headline.grid(row=0, column=5)
+    # Initialize labels
+    for place in range(numberOfPlaces):
+        label_to_display_ticket_number = Label(window, text=" Frei ")
+        label_to_display_ticket_number.config(font=("Courier", 44))
+        label_to_display_ticket_number.grid(
+            row=((place//2)*2)+1, column=((place % 2)*3)+1)
+        list_of_labels_to_display_ticket_number.append(
+            label_to_display_ticket_number)
+
+        label_to_display_place_number = Label(
+            window, text="Platz " + str(place+1), bg="green")
+        label_to_display_place_number.config(font=("Courier", 44))
+        label_to_display_place_number.grid(
+            row=((place//2)*2)+1, column=((place % 2)*3))
+        list_of_labels_to_display_place_number.append(
+            label_to_display_place_number)
+
+    for i in range(numberOfPlaces):
+        element = Label(window, text="--")
+        element.config(font=("Courier", 20))
+        element.grid(row=i+1, column=5)
+        list_of_labels_to_display_queue.append(element)
+
+    headline = Label(window, text="Macherdaach Badge Lötplatz-Zuweisungssystem")
+    headline.config(font=("Courier", 32))
+    headline.grid(row=0, column=0, columnspan=5)
+
+    queue_headline = Label(window, text="Queue")
+    queue_headline.config(font=("Courier", 32))
+    queue_headline.grid(row=0, column=5)
 
 
 def connect_mqtt() -> mqtt_client:
@@ -203,6 +203,8 @@ def run():
     subscribe(client)
 
     client.loop_start()
+
+    init_window()
     window.after(0, update_processing_time)
     window.mainloop()
 
