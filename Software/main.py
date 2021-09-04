@@ -73,7 +73,7 @@ class Controller(object):
                 print("time difference: " + str(current_processing_time))
                 if (median_processing_time == 0 or current_processing_time == 0):
                     element.config(
-                        text=str(model.list_of_ticket_numbers[count]) + "(???)")
+                        text=str(self.model.list_of_ticket_numbers[count]) + "(???)")
                 else:
                     estimated_processing_time = median_processing_time - current_processing_time
                     element.config(text=str(self.model.list_of_ticket_numbers[count]) + "(" + str(
@@ -110,7 +110,7 @@ class Controller(object):
                             print(
                                 "Not occupied - there is no ticket registered to this place")
                     else:
-                        # Place was given up by owner
+                        # Place was gi  ven up by owner
                         print("Released: " +
                               str(json_loaded["place_number"]))
                         place_number = json_loaded["place_number"] - 1
@@ -132,7 +132,7 @@ class Controller(object):
                             if self.model.list_of_ticket_numbers:
                                 # ticket list is not empty - register number from ticket list to place
                                 # Take first element of list_of_ticket_numbers and register the number to the current place and display it
-                                ticket_number = model.list_of_ticket_numbers.pop(0)
+                                ticket_number = self.model.list_of_ticket_numbers.pop(0)
                                 self.model.list_of_places[place_number].ticket_number = ticket_number
                                 self.model.list_of_places[place_number].state = PlaceState.REGISTERED
                                 self.model.list_of_labels_to_display_ticket_number[place_number].config(
@@ -171,7 +171,7 @@ class Controller(object):
                         if (placeInList == self.model.list_of_places[-1]):
                             # Found no vacant place - put number in queue
                             print("New number " + str(new_number))
-                            model.list_of_ticket_numbers.append(new_number)
+                            self.model.list_of_ticket_numbers.append(new_number)
                             self.update_queue()
             except Exception as e:
                 print(str(e))
