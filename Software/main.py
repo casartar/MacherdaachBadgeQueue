@@ -122,9 +122,9 @@ class Controller(object):
                             processing_time = datetime.now(
                                 tz=None) - self.model.list_of_places[place_number].start_time
                             self.model.list_of_places[place_number] = Place(place_number)
-
-                            self.model.list_of_labels_to_display_place_number[place_number].config(
-                                bg="green", text="--")
+                            self.model.list_of_labels_to_display_place_number[place_number].config(bg="green")
+                            self.model.list_of_labels_to_display_ticket_number[place_number].config(
+                                text="Frei")
                             # Save processing time in
                             print("Processing time: " + str(processing_time))
                             self.model.list_of_processing_times.append(processing_time)
