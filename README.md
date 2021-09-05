@@ -42,4 +42,4 @@ This repo houses the Lötplatz-Zuweisungssystem for the Macherdaach 2021 in Land
 
 These properties in the package view are responsible for displaying information in the gui.
 
-![](docs/img/labels and arrays.png)
+![](docs/img/labels_and_arrays_ing_gui.png)
