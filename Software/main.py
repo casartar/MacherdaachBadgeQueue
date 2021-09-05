@@ -42,11 +42,11 @@ class Controller(object):
     def update_queue(self, list_of_processing_times, list_of_labels_to_display_in_queue, list_of_ticket_numbers):
         print("Update Queue")
 
-        sorted_list_of_start_time = sorted(
+        self.model.sorted_list_of_start_time = sorted(
             self.model.list_of_places, key=lambda x: x.start_time or datetime.now(tz=None))
         for i in self.model.list_of_places:
             print(i.start_time)
-        for i in sorted_list_of_start_time:
+        for i in self.model.sorted_list_of_start_time:
             print(i.start_time)
         try:
             median_processing_time = statistics.median(list_of_processing_times)
@@ -62,10 +62,10 @@ class Controller(object):
                       "len(ticket_numbers): " + str(len(list_of_ticket_numbers)))
                 print("Number " + str(list_of_ticket_numbers[count]))
                 print(str(datetime.now(tz=None)) + " - " +
-                      str(sorted_list_of_start_time[count].start_time))
+                      str(self.model.sorted_list_of_start_time[count].start_time))
                 try:
                     current_processing_time = datetime.now(
-                        tz=None) - sorted_list_of_start_time[count].start_time
+                        tz=None) - self.model.sorted_list_of_start_time[count].start_time
                 except:
                     current_processing_time = 0
                 print("time difference: " + str(current_processing_time))

@@ -12,6 +12,7 @@ class Model(object):
         self.list_of_ticket_numbers = []
         self.list_of_processing_times = []
         self.list_of_places = []
+        self.sorted_list_of_start_time = []
         self.initPlaces()
 
     def initPlaces(self):  # Initialize list_of_places
