@@ -37,3 +37,9 @@ This repo houses the Lötplatz-Zuweisungssystem for the Macherdaach 2021 in Land
   "ticket_number":1
 }
 ```
+
+## Properties to access view
+
+These properties in the package view are responsible for displaying information in the gui.
+
+![](docs/img/labels and arrays.png)
