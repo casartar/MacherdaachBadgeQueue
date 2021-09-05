@@ -1,10 +1,11 @@
-import json
-import random
-import statistics
-from datetime import datetime
+from tkinter import Tk, Label
 
+import place as placepackage
 from paho.mqtt import client as mqtt_client
-
+import random
+import json
+from datetime import datetime
+import statistics
 from config import broker, username, password
 from model.model import Model
 from model.place import PlaceState, Place
