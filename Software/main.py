@@ -5,10 +5,9 @@ from datetime import datetime
 
 from paho.mqtt import client as mqtt_client
 
-from Software.model.model import Model
-from Software.model.place import PlaceState, Place
 from config import broker, username, password
-from model import model
+from model.model import Model
+from model.place import PlaceState, Place
 from view.view import View
 
 port = 1883
@@ -24,24 +23,22 @@ numberOfPlaces = 8
 # connection = sqlite3.connect(database)
 
 
-
-
 class Controller(object):
     def __init__(self):
 
-        self.model = Model(numberOfPlaces);
-        self.view = View(numberOfPlaces);
+        self.model = Model(numberOfPlaces)
+        self.view = View(numberOfPlaces)
 
-        self.view.initView(self.model.list_of_labels_to_display_ticket_number, self.model.list_of_labels_to_display_place_number, self.model.list_of_labels_to_display_in_queue);
-        self.client = self.connect_mqtt();
-        self.subscribe(self.client);
-        self.client.loop_start();
-
+        self.view.initView(self.model.list_of_labels_to_display_ticket_number,
+                           self.model.list_of_labels_to_display_place_number,
+                           self.model.list_of_labels_to_display_in_queue)
+        self.client = self.connect_mqtt()
+        self.subscribe(self.client)
+        self.client.loop_start()
         self.view.window.after(0, self.update_processing_time)
         self.view.window.mainloop()
 
-
-    def update_queue(self):
+    def update_queue(self, list_of_processing_times, list_of_labels_to_display_in_queue, list_of_ticket_numbers):
         print("Update Queue")
 
         sorted_list_of_start_time = sorted(
@@ -51,18 +48,18 @@ class Controller(object):
         for i in sorted_list_of_start_time:
             print(i.start_time)
         try:
-            median_processing_time = statistics.median(self.model.list_of_processing_times)
+            median_processing_time = statistics.median(list_of_processing_times)
         except:
             median_processing_time = 0
         print("Median processing time: " + str(median_processing_time))
         print("Now: " + str(datetime.now(tz=None)))
 
-        for count, element in enumerate(self.model.list_of_labels_to_display_in_queue):
+        for count, element in enumerate(list_of_labels_to_display_in_queue):
             print("Count " + str(count))
             if count < len(self.model.list_of_ticket_numbers):
                 print("Count " + str(count) + " < " +
-                      "len(ticket_numbers): " + str(len(self.model.list_of_ticket_numbers)))
-                print("Number " + str(self.model.list_of_ticket_numbers[count]))
+                      "len(ticket_numbers): " + str(len(list_of_ticket_numbers)))
+                print("Number " + str(list_of_ticket_numbers[count]))
                 print(str(datetime.now(tz=None)) + " - " +
                       str(sorted_list_of_start_time[count].start_time))
                 try:
@@ -73,17 +70,18 @@ class Controller(object):
                 print("time difference: " + str(current_processing_time))
                 if (median_processing_time == 0 or current_processing_time == 0):
                     element.config(
-                        text=str(self.model.list_of_ticket_numbers[count]) + "(???)")
+                        text=str(list_of_ticket_numbers[count]) + "(???)")
                 else:
                     estimated_processing_time = median_processing_time - current_processing_time
-                    element.config(text=str(self.model.list_of_ticket_numbers[count]) + "(" + str(
+                    element.config(text=str(list_of_ticket_numbers[count]) + "(" + str(
                         int(estimated_processing_time.total_seconds() / 60)) + " min)")
             else:
                 element.config(text="--")
 
     def update_processing_time(self):
         self.view.window.after(60000, self.update_processing_time)
-        self.update_queue()
+        self.update_queue(self.model.list_of_processing_times, self.model.list_of_labels_to_display_in_queue,
+                          self.model.list_of_ticket_numbers)
 
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
@@ -110,7 +108,7 @@ class Controller(object):
                             print(
                                 "Not occupied - there is no ticket registered to this place")
                     else:
-                        # Place was gi  ven up by owner
+                        # Place was given up by owner
                         print("Released: " +
                               str(json_loaded["place_number"]))
                         place_number = json_loaded["place_number"] - 1
@@ -159,7 +157,7 @@ class Controller(object):
                         if (placeInList.state == PlaceState.FREE):
                             # Found one - register ticket number to place
                             print("Register ticket: " +
-                                  str(new_number) + " to free place " + str(count+1))
+                                  str(new_number) + " to free place " + str(count + 1))
 
                             placeInList.state = PlaceState.REGISTERED
                             placeInList.ticket_number = new_number
@@ -181,7 +179,6 @@ class Controller(object):
         client.subscribe(topic_from_controller)
         client.on_message = on_message
 
-
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
             if rc == 0:
@@ -194,6 +191,7 @@ class Controller(object):
         client.on_connect = on_connect
         client.connect(broker, port)
         return client
+
 
 def run():
     Controller()
