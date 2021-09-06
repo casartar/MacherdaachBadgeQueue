@@ -81,9 +81,9 @@ class Controller(object):
             try:
                 mqtt_decoded = str(msg.payload.decode("utf-8", "ignore"))
                 json_loaded = json.loads(mqtt_decoded)
-                if (msg.topic == topic_from_place):
+                if msg.topic == topic_from_place:
                     handleMessageFromPlace(json_loaded)
-                elif (msg.topic == topic_from_controller):
+                elif msg.topic == topic_from_controller:
                     handleMessageFromController(json_loaded)
             except Exception as e:
                 print(str(e))
@@ -108,7 +108,7 @@ class Controller(object):
                 return
             for count, placeInList in enumerate(self.model.list_of_places):
                 # Search an empty place
-                if (placeInList.state == PlaceState.FREE):
+                if placeInList.state == PlaceState.FREE:
                     # Found one - register ticket number to place
                     print("Register ticket: " +
                           str(new_number) + " to free place " + str(count + 1))
@@ -120,19 +120,19 @@ class Controller(object):
                     self.model.list_of_labels_to_display_ticket_number[count].config(
                         text=placeInList.ticket_number)
                     break
-                if (placeInList == self.model.list_of_places[-1]):
+                if placeInList == self.model.list_of_places[-1]:
                     # Found no vacant place - put number in queue
                     print("New number " + str(new_number))
                     self.model.list_of_ticket_numbers.append(new_number)
 
         def handleMessageFromPlace(json_loaded):
-            if (json_loaded["place_occupied"] == True):
+            if json_loaded["place_occupied"] == True:
                 # Place was taken by the owner of the ticket_number
                 # Place number in MQTT-Message starts with 1 and must be decremented
                 place_number = json_loaded["place_number"] - 1
                 if place_number > numberOfPlaces or place_number < 0:
                         raise Exception('Received place_number ' + str(place_number) + ' refers to not existing place!')
-                if (self.model.list_of_places[place_number].state == PlaceState.REGISTERED):
+                if self.model.list_of_places[place_number].state == PlaceState.REGISTERED:
                     print("Occupied: " + str(place_number))
                     self.model.list_of_places[place_number].occupyPlace()
                     self.model.list_of_labels_to_display_place_number[place_number].config(
@@ -150,7 +150,7 @@ class Controller(object):
                       str(json_loaded["place_number"]))
                 place_number = json_loaded["place_number"] - 1
 
-                if (self.model.list_of_places[place_number].state != PlaceState.OCCUPIED):
+                if self.model.list_of_places[place_number].state != PlaceState.OCCUPIED:
                     print("Place is not in state OCCUPIED - can not be released")
 
                 else:

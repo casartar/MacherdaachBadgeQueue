@@ -27,7 +27,7 @@ class Place:
         self.state = PlaceState.OCCUPIED
 
     def registerTicket(self, ticketNumber):
-        if (self.state != PlaceState.FREE):
+        if self.state != PlaceState.FREE:
             self.state = PlaceState.REGISTERED
             self.ticket_number = ticketNumber
         else:
