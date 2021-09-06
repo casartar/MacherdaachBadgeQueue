@@ -128,6 +128,8 @@ class Controller(object):
                 # Place was taken by the owner of the ticket_number
                 # Place number in MQTT-Message starts with 1 and must be decremented
                 place_number = json_loaded["place_number"] - 1
+                if place_number > numberOfPlaces or place_number < 0:
+                        raise Exception('Received place_number ' + str(place_number) + ' refers to not existing place!')
                 if (self.model.list_of_places[place_number].state == PlaceState.REGISTERED):
                     print("Occupied: " + str(place_number))
                     self.model.list_of_places[place_number].occupyPlace()
