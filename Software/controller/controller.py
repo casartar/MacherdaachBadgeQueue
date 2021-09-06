@@ -94,6 +94,8 @@ class Controller(object):
             new_number = json_loaded["new_number"]
             print("Received new ticket number from controller: " +
                   str(new_number))
+            if new_number < 0:
+                    raise Exception('New ticket number must be positive!')
             # Check if new number is already in use
             for placeInList in self.model.list_of_places:
                 if placeInList.ticket_number == new_number:
