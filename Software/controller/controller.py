@@ -3,10 +3,10 @@ import random
 import json
 from datetime import datetime
 import statistics
-from Software.config import broker, username, password
-from Software.model.model import Model
-from Software.model.place import PlaceState, Place
-from Software.view.view import View
+from config import broker, username, password
+from model.model import Model
+from model.place import PlaceState, Place
+from view.view import View
 
 port = 1883
 topic_from_place = "macherdaach/queue/messageFromPlace"

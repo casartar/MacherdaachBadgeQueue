@@ -1,4 +1,4 @@
-import place
+from model.place import Place
 
 
 class Model(object):
@@ -17,4 +17,4 @@ class Model(object):
 
     def initPlaces(self):  # Initialize list_of_places
         for i in range(self.numberOfPlaces):
-            self.list_of_places.append(place.Place())
+            self.list_of_places.append(Place())
