@@ -82,90 +82,92 @@ class Controller(object):
                 mqtt_decoded = str(msg.payload.decode("utf-8", "ignore"))
                 json_loaded = json.loads(mqtt_decoded)
                 if (msg.topic == topic_from_place):
-                    # message received from place
-                    if (json_loaded["place_occupied"] == True):
-                        # Place was taken by the owner of the ticket_number
-                        # Place number in MQTT-Message starts with 1 and must be decremented
-                        place_number = json_loaded["place_number"] - 1
-                        if (self.model.list_of_places[place_number].state == PlaceState.REGISTERED):
-                            print("Occupied: " + str(place_number))
-                            self.model.list_of_places[place_number].occupyPlace()
-                            self.model.list_of_labels_to_display_place_number[place_number].config(
-                                bg="red")
-                            self.model.list_of_labels_to_display_ticket_number[place_number].config(
-                                text="Belegt")
-                            self.model.list_of_places[place_number].setstarttime(datetime.now(
-                                tz=None))
-                        else:
-                            print(
-                                "Not occupied - there is no ticket registered to this place")
-                    else:
-                        # Place was given up by owner
-                        print("Released: " +
-                              str(json_loaded["place_number"]))
-                        place_number = json_loaded["place_number"] - 1
-
-                        if (self.model.list_of_places[place_number].state != PlaceState.OCCUPIED):
-                            print("Place is not in state OCCUPIED - can not be released")
-
-                        else:
-                            processing_time = datetime.now(
-                                tz=None) - self.model.list_of_places[place_number].start_time
-                            self.model.list_of_places[place_number] = Place(place_number)
-                            self.model.list_of_labels_to_display_place_number[place_number].config(bg="green")
-                            self.model.list_of_labels_to_display_ticket_number[place_number].config(
-                                text="Frei")
-                            # Save processing time in
-                            print("Processing time: " + str(processing_time))
-                            self.model.list_of_processing_times.append(processing_time)
-                            # Search for a new number in list_of_ticket_numbers to be registered to the released place
-                            if self.model.list_of_ticket_numbers:
-                                # ticket list is not empty - register number from ticket list to place
-                                # Take first element of list_of_ticket_numbers and register the number to the current place and display it
-                                ticket_number = self.model.list_of_ticket_numbers.pop(0)
-                                self.model.list_of_places[place_number].ticket_number = ticket_number
-                                self.model.list_of_places[place_number].state = PlaceState.REGISTERED
-                                self.model.list_of_labels_to_display_ticket_number[place_number].config(
-                                    text="%6d" % ticket_number)
-                                self.update_queue()
-
+                    handleMessageFromPlace(json_loaded)
                 elif (msg.topic == topic_from_controller):
-                    # message received from controller
-                    new_number = json_loaded["new_number"]
-                    print("Received new ticket number from controller: " +
-                          str(new_number))
-                    # Check if new number is already in use
-                    for placeInList in self.model.list_of_places:
-                        if placeInList.ticket_number == new_number:
-                            print("New number " + str(new_number) +
-                                  " already registered")
-                            return
-                    if new_number in self.model.list_of_ticket_numbers:
-                        print("New number " + str(new_number) +
-                              "already in ticket number list")
-                        return
-                    for count, placeInList in enumerate(self.model.list_of_places):
-                        # Search an empty place
-                        if (placeInList.state == PlaceState.FREE):
-                            # Found one - register ticket number to place
-                            print("Register ticket: " +
-                                  str(new_number) + " to free place " + str(count + 1))
-
-                            placeInList.state = PlaceState.REGISTERED
-                            placeInList.ticket_number = new_number
-                            self.model.list_of_labels_to_display_place_number[count].config(
-                                bg="green")
-                            self.model.list_of_labels_to_display_ticket_number[count].config(
-                                text=placeInList.ticket_number)
-                            break
-                        if (placeInList == self.model.list_of_places[-1]):
-                            # Found no vacant place - put number in queue
-                            print("New number " + str(new_number))
-                            self.model.list_of_ticket_numbers.append(new_number)
-                            self.update_queue()
+                    handleMessageFromController(json_loaded)
             except Exception as e:
                 print(str(e))
                 print("Something went wrong on mqtt reception")
+            self.update_queue(self.model.list_of_processing_times, self.model.list_of_labels_to_display_in_queue, self.model.list_of_ticket_numbers)
+
+        def handleMessageFromController(json_loaded):
+            new_number = json_loaded["new_number"]
+            print("Received new ticket number from controller: " +
+                  str(new_number))
+            # Check if new number is already in use
+            for placeInList in self.model.list_of_places:
+                if placeInList.ticket_number == new_number:
+                    print("New number " + str(new_number) +
+                          " already registered")
+                    return
+            if new_number in self.model.list_of_ticket_numbers:
+                print("New number " + str(new_number) +
+                      "already in ticket number list")
+                return
+            for count, placeInList in enumerate(self.model.list_of_places):
+                # Search an empty place
+                if (placeInList.state == PlaceState.FREE):
+                    # Found one - register ticket number to place
+                    print("Register ticket: " +
+                          str(new_number) + " to free place " + str(count + 1))
+
+                    placeInList.state = PlaceState.REGISTERED
+                    placeInList.ticket_number = new_number
+                    self.model.list_of_labels_to_display_place_number[count].config(
+                        bg="green")
+                    self.model.list_of_labels_to_display_ticket_number[count].config(
+                        text=placeInList.ticket_number)
+                    break
+                if (placeInList == self.model.list_of_places[-1]):
+                    # Found no vacant place - put number in queue
+                    print("New number " + str(new_number))
+                    self.model.list_of_ticket_numbers.append(new_number)
+
+        def handleMessageFromPlace(json_loaded):
+            if (json_loaded["place_occupied"] == True):
+                # Place was taken by the owner of the ticket_number
+                # Place number in MQTT-Message starts with 1 and must be decremented
+                place_number = json_loaded["place_number"] - 1
+                if (self.model.list_of_places[place_number].state == PlaceState.REGISTERED):
+                    print("Occupied: " + str(place_number))
+                    self.model.list_of_places[place_number].occupyPlace()
+                    self.model.list_of_labels_to_display_place_number[place_number].config(
+                        bg="red")
+                    self.model.list_of_labels_to_display_ticket_number[place_number].config(
+                        text="Belegt")
+                    self.model.list_of_places[place_number].setstarttime(datetime.now(
+                        tz=None))
+                else:
+                    print(
+                        "Not occupied - there is no ticket registered to this place")
+            else:
+                # Place was given up by owner
+                print("Released: " +
+                      str(json_loaded["place_number"]))
+                place_number = json_loaded["place_number"] - 1
+
+                if (self.model.list_of_places[place_number].state != PlaceState.OCCUPIED):
+                    print("Place is not in state OCCUPIED - can not be released")
+
+                else:
+                    processing_time = datetime.now(
+                        tz=None) - self.model.list_of_places[place_number].start_time
+                    self.model.list_of_places[place_number] = Place(place_number)
+                    self.model.list_of_labels_to_display_place_number[place_number].config(bg="green")
+                    self.model.list_of_labels_to_display_ticket_number[place_number].config(
+                        text="Frei")
+                    # Save processing time in
+                    print("Processing time: " + str(processing_time))
+                    self.model.list_of_processing_times.append(processing_time)
+                    # Search for a new number in list_of_ticket_numbers to be registered to the released place
+                    if self.model.list_of_ticket_numbers:
+                        # ticket list is not empty - register number from ticket list to place
+                        # Take first element of list_of_ticket_numbers and register the number to the current place and display it
+                        ticket_number = self.model.list_of_ticket_numbers.pop(0)
+                        self.model.list_of_places[place_number].ticket_number = ticket_number
+                        self.model.list_of_places[place_number].state = PlaceState.REGISTERED
+                        self.model.list_of_labels_to_display_ticket_number[place_number].config(
+                            text="%6d" % ticket_number)
 
         client.subscribe(topic_from_place)
         client.subscribe(topic_from_controller)
