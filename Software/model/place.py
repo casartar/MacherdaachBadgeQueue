@@ -14,7 +14,7 @@ class Place:
         self.ticket_number = ticket_number  # registered ticket number
         self.start_time = start_time
 
-    def setstarttime (self, start_time):
+    def setstarttime(self, start_time):
         self.start_time = start_time
 
     def clear_place_state(self):
@@ -22,13 +22,25 @@ class Place:
         self.state = PlaceState.FREE
         self.ticket_number = 0
 
+    def set_place_state_to_reserved(self):
+        self.state = PlaceState.REGISTERED
+
     def set_place_state_to_occupied(self):
         # Todo: occupy only possible, when place has status registered and user has same ticket number as reservation
         self.state = PlaceState.OCCUPIED
 
-    def registerTicket(self, ticketNumber):
+    def register_ticket(self, ticket_number):
         if self.state != PlaceState.FREE:
             self.state = PlaceState.REGISTERED
-            self.ticket_number = ticketNumber
+            self.ticket_number = ticket_number
         else:
             raise RegistrationError('Can only register to free place')
+
+    def is_free(self):
+        if self.state == PlaceState.FREE:
+            return True
+        else:
+            return False
+
+    def set_ticket_number(self, ticket_number):
+        self.ticket_number = ticket_number;
