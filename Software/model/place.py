@@ -17,7 +17,7 @@ class Place:
     def setstarttime(self, start_time):
         self.start_time = start_time
 
-    def clear_place_state(self):
+    def clear_place(self):
 
         self.state = PlaceState.FREE
         self.ticket_number = 0

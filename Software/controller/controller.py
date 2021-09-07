@@ -83,16 +83,16 @@ class Controller(object):
                 mqtt_decoded = str(msg.payload.decode("utf-8", "ignore"))
                 json_loaded = json.loads(mqtt_decoded)
                 if msg.topic == topic_from_place:
-                    handleMessageFromPlace(self, json_loaded)
+                    handle_message_from_place(self, json_loaded)
                 elif msg.topic == topic_from_controller:
-                    handleMessageFromController(self, json_loaded)
+                    handle_message_from_controller(self, json_loaded)
             except Exception as e:
                 print(str(e))
                 print("Something went wrong on mqtt reception")
             self.update_queue(self.model.list_of_processing_times, self.model.list_of_labels_to_display_in_queue,
                               self.model.list_of_ticket_numbers)
 
-        def handleMessageFromController(self, json_loaded):
+        def handle_message_from_controller(self, json_loaded):
             new_number = json_loaded["new_number"]
             print("Received new ticket number from controller: " +
                   str(new_number))
@@ -121,31 +121,29 @@ class Controller(object):
                     print("New number " + str(new_number))
                     self.model.list_of_ticket_numbers.append(new_number)
 
-        def handleMessageFromPlace(self, json_loaded):
+        def handle_message_from_place(self, json_loaded):
+            if type(json_loaded["place_occupied"]) != bool:
+                raise Exception('Key "place_occupied" is of wrong type! Must be boolean!')
+            place_number = json_loaded["place_number"] - 1
+            if place_number > numberOfPlaces or place_number < 0:
+                raise Exception('Received place_number ' + str(place_number) + ' refers to not existing place!')
             if json_loaded["place_occupied"] == True:
                 # Place was taken by the owner of the ticket_number
                 # Place number in MQTT-Message starts with 1 and must be decremented
-                place_number = json_loaded["place_number"] - 1
-                if place_number > numberOfPlaces or place_number < 0:
-                    raise Exception('Received place_number ' + str(place_number) + ' refers to not existing place!')
                 if self.model.list_of_places[place_number].state == PlaceState.REGISTERED:
                     occupyPlace(self, place_number)
                 else:
-                    print(
-                        "Not occupied - there is no ticket registered to this place")
+                    raise Exception("Not occupied - there is no ticket registered to this place")
             if json_loaded["place_occupied"] == False:
                 # Place was given up by owner
                 print("Released: " +
                       str(json_loaded["place_number"]))
-                place_number = json_loaded["place_number"] - 1
-
                 if self.model.list_of_places[place_number].state != PlaceState.OCCUPIED:
-                    print("Place is not in state OCCUPIED - can not be released")
-
+                    raise Exception("Not occupied - there is no ticket registered to this place")
                 else:
                     processing_time = datetime.now(
                         tz=None) - self.model.list_of_places[place_number].start_time
-                    self.model.list_of_places[place_number] = Place(place_number)
+                    self.model.list_of_places[place_number].clear_place()
                     self.model.list_of_labels_to_display_place_number[place_number].config(bg="green")
                     self.model.list_of_labels_to_display_ticket_number[place_number].config(
                         text="Frei")
@@ -158,8 +156,6 @@ class Controller(object):
                         # Take first element of list_of_ticket_numbers and register the number to the current place and display it
                         ticket_number = self.model.list_of_ticket_numbers.pop(0)
                         reservePlaceForTicketNumber(self, place_number, ticket_number)
-            else:
-                raise Exception('Key "place_occupied" is of wrong type! Must be boolean!')
 
         def occupyPlace(self, place_number):
             self.model.list_of_places[place_number].set_place_state_to_occupied()
