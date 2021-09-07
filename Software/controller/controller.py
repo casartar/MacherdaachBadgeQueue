@@ -82,15 +82,15 @@ class Controller(object):
                 mqtt_decoded = str(msg.payload.decode("utf-8", "ignore"))
                 json_loaded = json.loads(mqtt_decoded)
                 if msg.topic == topic_from_place:
-                    handleMessageFromPlace(json_loaded)
+                    handleMessageFromPlace(self, json_loaded)
                 elif msg.topic == topic_from_controller:
-                    handleMessageFromController(json_loaded)
+                    handleMessageFromController(self, json_loaded)
             except Exception as e:
                 print(str(e))
                 print("Something went wrong on mqtt reception")
             self.update_queue(self.model.list_of_processing_times, self.model.list_of_labels_to_display_in_queue, self.model.list_of_ticket_numbers)
 
-        def handleMessageFromController(json_loaded):
+        def handleMessageFromController(self, json_loaded):
             new_number = json_loaded["new_number"]
             print("Received new ticket number from controller: " +
                   str(new_number))
@@ -125,7 +125,7 @@ class Controller(object):
                     print("New number " + str(new_number))
                     self.model.list_of_ticket_numbers.append(new_number)
 
-        def handleMessageFromPlace(json_loaded):
+        def handleMessageFromPlace(self, json_loaded):
             if json_loaded["place_occupied"] == True:
                 # Place was taken by the owner of the ticket_number
                 # Place number in MQTT-Message starts with 1 and must be decremented
