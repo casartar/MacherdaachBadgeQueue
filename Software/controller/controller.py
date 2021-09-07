@@ -137,7 +137,7 @@ class Controller(object):
                 else:
                     print(
                         "Not occupied - there is no ticket registered to this place")
-            else:
+            if json_loaded["place_occupied"] == False:
                 # Place was given up by owner
                 print("Released: " +
                       str(json_loaded["place_number"]))
@@ -165,6 +165,8 @@ class Controller(object):
                         self.model.list_of_places[place_number].state = PlaceState.REGISTERED
                         self.model.list_of_labels_to_display_ticket_number[place_number].config(
                             text="%6d" % ticket_number)
+            else:
+                raise Exception('Key "place_occupied" is of wrong type! Must be boolean!')
 
         def occupyPlace(self, place_number):
             self.model.list_of_places[place_number].set_place_state_to_occupied()
