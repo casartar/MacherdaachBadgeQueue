@@ -133,14 +133,7 @@ class Controller(object):
                 if place_number > numberOfPlaces or place_number < 0:
                         raise Exception('Received place_number ' + str(place_number) + ' refers to not existing place!')
                 if self.model.list_of_places[place_number].state == PlaceState.REGISTERED:
-                    print("Occupied: " + str(place_number))
-                    self.model.list_of_places[place_number].occupyPlace()
-                    self.model.list_of_labels_to_display_place_number[place_number].config(
-                        bg="red")
-                    self.model.list_of_labels_to_display_ticket_number[place_number].config(
-                        text="Belegt")
-                    self.model.list_of_places[place_number].setstarttime(datetime.now(
-                        tz=None))
+                    occupyPlace(self, place_number)
                 else:
                     print(
                         "Not occupied - there is no ticket registered to this place")
@@ -172,6 +165,16 @@ class Controller(object):
                         self.model.list_of_places[place_number].state = PlaceState.REGISTERED
                         self.model.list_of_labels_to_display_ticket_number[place_number].config(
                             text="%6d" % ticket_number)
+
+        def occupyPlace(self, place_number):
+            self.model.list_of_places[place_number].set_place_state_to_occupied()
+            self.model.list_of_labels_to_display_place_number[place_number].config(
+                bg="red")
+            self.model.list_of_labels_to_display_ticket_number[place_number].config(
+                text="Belegt")
+            self.model.list_of_places[place_number].setstarttime(datetime.now(
+                tz=None))
+            print("Occupied: " + str(place_number))
 
         client.subscribe(topic_from_place)
         client.subscribe(topic_from_controller)

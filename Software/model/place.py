@@ -17,12 +17,12 @@ class Place:
     def setstarttime (self, start_time):
         self.start_time = start_time
 
-    def clearplace(self):
+    def clear_place_state(self):
 
         self.state = PlaceState.FREE
         self.ticket_number = 0
 
-    def occupyPlace(self):
+    def set_place_state_to_occupied(self):
         # Todo: occupy only possible, when place has status registered and user has same ticket number as reservation
         self.state = PlaceState.OCCUPIED
 
