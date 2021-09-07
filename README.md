@@ -13,6 +13,12 @@ This repo houses the Lötplatz-Zuweisungssystem for the Macherdaach 2021 in Land
 
 ## Sample MQTT Messages
 
+### Topics
+
+```topic_from_place = "macherdaach/queue/messageFromPlace"```
+
+```topic_from_controller = "macherdaach/queue/messageFromController"```
+
 ### New user has arrived at place one and starts soldering
 
 ```
