@@ -124,12 +124,12 @@ class Controller(object):
         def handle_message_from_place(self, json_loaded):
             if type(json_loaded["place_occupied"]) != bool:
                 raise Exception('Key "place_occupied" is of wrong type! Must be boolean!')
+            # Place number in MQTT-Message starts with 1 and must be decremented
             place_number = json_loaded["place_number"] - 1
             if place_number > numberOfPlaces or place_number < 0:
                 raise Exception('Received place_number ' + str(place_number) + ' refers to not existing place!')
             if json_loaded["place_occupied"] == True:
                 # Place was taken by the owner of the ticket_number
-                # Place number in MQTT-Message starts with 1 and must be decremented
                 if self.model.list_of_places[place_number].state == PlaceState.REGISTERED:
                     occupyPlace(self, place_number)
                 else:
