@@ -5,7 +5,7 @@ from datetime import datetime
 import statistics
 from config import broker, username, password
 from model.model import Model
-from model.place import PlaceState, Place
+from model.place import PlaceState
 from view.view import View
 
 port = 1883
