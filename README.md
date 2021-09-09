@@ -2,7 +2,9 @@
 
 This repo houses the Lötplatz-Zuweisungssystem for the Macherdaach 2021 in Landau, hosted by [ZTL](https://ztl.space/). 
 
-## Getting started
+## Getting started ...
+
+### ... with PyCharm
 
 1. Checkout the repo via ```git clone``` 
 2. Get the MQTT-config file to access the mqtt broker
@@ -10,6 +12,13 @@ This repo houses the Lötplatz-Zuweisungssystem for the Macherdaach 2021 in Land
 3. Initialize with your favourite IDE
    1. Sample configuration for [PyCharm](https://www.jetbrains.com/help/pycharm/quick-start-guide.html): ![img.png](docs/img/img.png)
    2. ...
+
+### ... on your favourite command line
+
+This project is self-contained. You should have no trouble executing the application from the directory 'Software'
+
+```python main.py```
+
 
 ## Sample MQTT Messages
 
