@@ -1,4 +1,4 @@
-import place
+from Software.model import place
 
 
 class Model(object):
