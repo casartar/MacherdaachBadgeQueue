@@ -83,9 +83,9 @@ class Controller(object):
                 mqtt_decoded = str(msg.payload.decode("utf-8", "ignore"))
                 json_loaded = json.loads(mqtt_decoded)
                 if msg.topic == topic_from_place:
-                    handle_message_from_place(self, json_loaded)
+                    self.handle_message_from_place(self, json_loaded)
                 elif msg.topic == topic_from_controller:
-                    handle_message_from_controller(self, json_loaded)
+                    self.handle_message_from_controller(self, json_loaded)
             except Exception as e:
                 print(str(e))
                 print("Something went wrong on mqtt reception")
