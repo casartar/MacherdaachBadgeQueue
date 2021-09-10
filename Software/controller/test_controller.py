@@ -13,18 +13,15 @@ class TestController(TestCase):
         self.assertTrue(reserved_place == Place(PlaceState.REGISTERED, 1))
 
     def test_occupy_place(self):
-        c = Controller()
         occupied_place = c.occupyPlace(1)
         self.assertTrue(occupied_place.state == PlaceState.OCCUPIED)
 
     def test_handle_message_from_place_for_illegal_json(self):
         illegal_json_from_place = json.loads('{"place_number": 1,"place_occupiedTYPOERROR": false}')
-        c = Controller()
         self.assertRaises(Exception, c.handle_message_from_place, illegal_json_from_place)
 
     def test_handle_new_ticket_number(self):
         new_ticket_json = json.loads('{"new_number":1}')
-        c = Controller()
         c.handle_message_from_controller(new_ticket_json)
         self.assertTrue(c.model.list_of_places[0] == Place(PlaceState.REGISTERED, 1))
 
