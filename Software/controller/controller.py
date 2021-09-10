@@ -19,13 +19,15 @@ numberOfPlaces = 8
 class Controller(object):
     def __init__(self):
 
+        self.client = self.connect_mqtt()
         self.model = Model(numberOfPlaces)
         self.view = View(numberOfPlaces)
-
         self.view.initView(self.model.list_of_labels_to_display_ticket_number,
                            self.model.list_of_labels_to_display_place_number,
                            self.model.list_of_labels_to_display_in_queue)
-        self.client = self.connect_mqtt()
+
+    def startup_controller(self):
+
         self.subscribe(self.client)
         self.client.loop_start()
         self.view.window.after(0, self.update_processing_time)
@@ -105,7 +107,7 @@ class Controller(object):
         # Check if new number is already in use
         for placeInList in self.model.list_of_places:
             if placeInList.ticket_number == new_number:
-                print("New number " + str(new_number) +
+                raise Exception("New number " + str(new_number) +
                       " already registered")
                 return
         if new_number in self.model.list_of_ticket_numbers:
@@ -170,6 +172,7 @@ class Controller(object):
         self.model.list_of_places[place_number].setstarttime(datetime.now(
             tz=None))
         print("Occupied: " + str(place_number))
+        return self.model.list_of_places[place_number]
 
     def reservePlaceForTicketNumber(self, place_number, ticket_number):
         self.model.list_of_places[place_number].set_place_state_to_reserved()
@@ -178,6 +181,7 @@ class Controller(object):
             bg="green")
         self.model.list_of_labels_to_display_ticket_number[place_number].config(
             text=ticket_number)
+        return self.model.list_of_places[place_number]
 
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
