@@ -26,8 +26,10 @@ class Place:
         self.state = PlaceState.REGISTERED
 
     def set_place_state_to_occupied(self):
-        # Todo: occupy only possible, when place has status registered and user has same ticket number as reservation
-        self.state = PlaceState.OCCUPIED
+        if self.state == PlaceState.FREE:
+            self.state = PlaceState.OCCUPIED
+        else:
+            raise Exception('Can only occupy free place.')
 
     def register_ticket(self, ticket_number):
         if self.state != PlaceState.FREE:
