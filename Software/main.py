@@ -2,7 +2,7 @@ from controller.controller import Controller
 
 
 def run():
-    Controller()
+    Controller().startup_controller()
 
 
 if __name__ == '__main__':

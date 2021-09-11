@@ -45,4 +45,9 @@ class Place:
             return False
 
     def set_ticket_number(self, ticket_number):
-        self.ticket_number = ticket_number;
+        self.ticket_number = ticket_number
+
+    def __eq__(self, other):
+        if (isinstance(other, Place)):
+            return self.state == other.state and self.start_time == other.start_time and self.ticket_number == other.ticket_number
+        return False
