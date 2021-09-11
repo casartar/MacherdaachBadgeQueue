@@ -62,14 +62,13 @@ class Controller(object):
                     current_processing_time = 0
                 print("time difference: " + str(current_processing_time))
                 if (median_processing_time == 0 or current_processing_time == 0):
-                    element.config(
-                        text=str(list_of_ticket_numbers[count]) + "(???)")
+                    element.set_text(list_of_ticket_numbers[count] + "(???)")
                 else:
                     estimated_processing_time = median_processing_time - current_processing_time
-                    element.config(text=str(list_of_ticket_numbers[count]) + "(" + str(
+                    element.set_text(str(list_of_ticket_numbers[count]) + "(" + str(
                         int(estimated_processing_time.total_seconds() / 60)) + " min)")
             else:
-                element.config(text="--")
+                element.set_text("--")
 
     def update_processing_time(self):
         self.view.window.after(60000, self.update_processing_time)
@@ -148,9 +147,8 @@ class Controller(object):
                 processing_time = datetime.now(
                     tz=None) - self.model.list_of_places[place_number].start_time
                 self.model.list_of_places[place_number].clear_place()
-                self.model.list_of_labels_to_display_place_number[place_number].config(bg="green")
-                self.model.list_of_labels_to_display_ticket_number[place_number].config(
-                    text="Frei")
+                self.model.list_of_labels_to_display_place_number[place_number].set_color("green")
+                self.model.list_of_labels_to_display_ticket_number[place_number].set_text("Frei")
                 # Save processing time in
                 print("Processing time: " + str(processing_time))
                 self.model.list_of_processing_times.append(processing_time)
@@ -163,10 +161,8 @@ class Controller(object):
 
     def occupyPlace(self, place_number):
         self.model.list_of_places[place_number].set_place_state_to_occupied()
-        self.model.list_of_labels_to_display_place_number[place_number].config(
-            bg="red")
-        self.model.list_of_labels_to_display_ticket_number[place_number].config(
-            text="Belegt")
+        self.model.list_of_labels_to_display_place_number[place_number].set_color("red")
+        self.model.list_of_labels_to_display_ticket_number[place_number].set_text("Belegt")
         self.model.list_of_places[place_number].setstarttime(datetime.now(
             tz=None))
         print("Occupied: " + str(place_number))
@@ -174,10 +170,8 @@ class Controller(object):
     def reservePlaceForTicketNumber(self, place_number, ticket_number):
         self.model.list_of_places[place_number].set_place_state_to_reserved()
         self.model.list_of_places[place_number].set_ticket_number(ticket_number)
-        self.model.list_of_labels_to_display_place_number[place_number].config(
-            bg="green")
-        self.model.list_of_labels_to_display_ticket_number[place_number].config(
-            text=ticket_number)
+        self.model.list_of_labels_to_display_place_number[place_number].set_color("green")
+        self.model.list_of_labels_to_display_ticket_number[place_number].set_text(ticket_number)
 
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
