@@ -2,7 +2,7 @@ import json
 from unittest import TestCase
 
 from controller import Controller
-from model.place import Place, PlaceState
+from place import Place, PlaceState
 
 c = Controller()
 
@@ -10,7 +10,7 @@ c = Controller()
 class TestController(TestCase):
 
     def test_reserve_place_for_ticket_number(self):
-        reserved_place = c.reservePlaceForTicketNumber(1, 1)
+        reserved_place = c.reservePlaceForTicketNumber(PlaceState.REGISTERED, 1)
         self.assertTrue(reserved_place == Place(PlaceState.REGISTERED, 1))
 
     def test_occupy_place(self):
