@@ -19,19 +19,27 @@ class View:
         for place in range(numberOfPlaces + 1):
             self.window.rowconfigure(place, weight=1)
 
+    class QueueLabel(Label):
+        def set_text(self, new_text):
+            self.config(text=new_text)
+            return self
+
+        def set_color(self, new_color):
+            self.config(bg=new_color)
+            return self
+
     def initView(self, list_of_labels_to_display_ticket_number, list_of_labels_to_display_place_number,
                  list_of_labels_to_display_in_queue):
         # Initialize labels
         for place in range(self.numberOfPlaces):
-            label_to_display_ticket_number = Label(self.window, text=" Frei ")
+            label_to_display_ticket_number = self.QueueLabel(self.window).set_text("Frei")
             label_to_display_ticket_number.config(font=("Courier", 44))
             label_to_display_ticket_number.grid(
                 row=((place // 2) * 2) + 1, column=((place % 2) * 3) + 1)
             list_of_labels_to_display_ticket_number.append(
                 label_to_display_ticket_number)
 
-            label_to_display_place_number = Label(
-                self.window, text="Platz " + str(place + 1), bg="green")
+            label_to_display_place_number = self.QueueLabel(self.window).set_text("Platz " + str(place + 1)).set_color("green")
             label_to_display_place_number.config(font=("Courier", 44))
             label_to_display_place_number.grid(
                 row=((place // 2) * 2) + 1, column=((place % 2) * 3))
@@ -39,16 +47,16 @@ class View:
                 label_to_display_place_number)
 
         for i in range(self.numberOfPlaces):
-            element = Label(self.window, text="--")
+            element = self.QueueLabel(self.window).set_text("--")
             element.config(font=("Courier", 20))
             element.grid(row=i + 1, column=5)
             list_of_labels_to_display_in_queue.append(element)
 
         # Init Headline
-        headline = Label(self.window, text="Macherdaach Badge Lötplatz-Zuweisungssystem")
+        headline = self.QueueLabel(self.window).set_text("Macherdaach Badge Lötplatz-Zuweisungssystem")
         headline.config(font=("Courier", 32))
         headline.grid(row=0, column=0, columnspan=5)
 
-        queue_headline = Label(self.window, text="Queue")
+        queue_headline = self.QueueLabel(self.window).set_text("Queue")
         queue_headline.config(font=("Courier", 32))
         queue_headline.grid(row=0, column=5)
