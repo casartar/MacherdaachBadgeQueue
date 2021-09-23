@@ -80,7 +80,7 @@ console.log('NEXT')
   
 
     </script>
-    <h1>BADEADMIN:</h1>
+    <h1>BADGEADMIN:</h1>
     <nav>
       <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Neue Nummer</button>
@@ -90,16 +90,69 @@ console.log('NEXT')
     </nav>
     <div class="tab-content" id="nav-tabContent">
       <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-        <div class="col-lg-6">
-        <div class="input-group mb-3">
-          <input id="nextnum" type="number" class="form-control" placeholder="NEW Queue Member" aria-label="NEW Queue Member" aria-describedby="basic-addon2">
-          <button onclick="nextUser();" id="next" class="input-group-text" id="basic-addon2">NEXT</button>
+        <div class="col-xl-6">
+          <div class="input-group col-xl-6">
+            <input id="nextnum" type="number" class="form-control col-3" placeholder="NEW Queue Member" aria-label="NEW Queue Member" aria-describedby="basic-addon2">
+            <button onclick="nextUser();" id="next" class="btn btn-primary" >NEXT</button>
+          </div>
         </div>
-      </div>
       </div>
       
       <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-seats-tab">
-        
+        <div class="container">
+          <div class="row g-2">
+            
+              <div class="input-group">
+                <span class="input-group-text col-6">Arbeitsplatz 1 </span>
+                <button onclick="TableStart(1);" class="btn btn-success col-3">START</button>
+                <button onclick="TableEnd(1);" class="btn btn-danger col-3" >END</button>
+              </div>
+            
+              <div class="input-group">
+                <span class="input-group-text col-6">Arbeitsplatz 2 </span>
+                <button onclick="TableStart(2);" class="btn btn-success col-3">START</button>
+                <button onclick="TableEnd(2);" class="btn btn-danger col-3" >END</button>
+              </div>
+
+              <div class="input-group">
+                <span class="input-group-text col-6">Arbeitsplatz 3 </span>
+                <button onclick="TableStart(3);" class="btn btn-success col-3">START</button>
+                <button onclick="TableEnd(3);" class="btn btn-danger col-3" >END</button>
+              </div>
+
+          
+
+              <div class="input-group">
+                <span class="input-group-text col-6">Arbeitsplatz 4 </span>
+                <button onclick="TableStart(4);" class="btn btn-success col-3">START</button>
+                <button onclick="TableEnd(4);" class="btn btn-danger col-3" >END</button>
+              </div>
+
+              <div class="input-group">
+                <span class="input-group-text col-6">Arbeitsplatz 5 </span>
+                <button onclick="TableStart(5);" class="btn btn-success col-3">START</button>
+                <button onclick="TableEnd(5);" class="btn btn-danger col-3" >END</button>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text col-6">Arbeitsplatz 6 </span>
+                <button onclick="TableStart(6);" class="btn btn-success col-3">START</button>
+                <button onclick="TableEnd(6);" class="btn btn-danger col-3" >END</button>
+              </div>
+
+              <div class="input-group">
+                <span class="input-group-text col-6">Arbeitsplatz 7 </span>
+                <button onclick="TableStart(7);" class="btn btn-success col-3">START</button>
+                <button onclick="TableEnd(7);" class="btn btn-danger col-3" >END</button>
+              </div>
+
+              <div class="input-group">
+                <span class="input-group-text col-6">Arbeitsplatz 8 </span>
+                <button onclick="TableStart(8);" class="btn btn-success col-3">START</button>
+                <button onclick="TableEnd(8);" class="btn btn-danger col-3" >END</button>
+              </div>
+
+        </div>
+        </div>
       </div>
       
       
