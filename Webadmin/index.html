@@ -15,68 +15,110 @@
     <script>
 
         // Globally initializes an mqtt variable
-        const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8)
+        const clientId = 'webadmin_' + Math.random().toString(16).substr(2, 8)
 currentNumber = 0
-const host = 'ws://localhost:8080/'
+const host = 'ws://ztl@ztl-mqtt.westeurope.azurecontainer.io:15675/ws'
+var serverUrl   = 'ws://ztl@ztl-mqtt.westeurope.azurecontainer.io:15675/ws';     /* wss://mqtt.cumulocity.com/mqtt for a secure connection */
+var device_name = "Webadmin";
+var username    = "ztl";
+var password    = "Ztl2019!";
 
-const options = {
-    userName:'ztl',
-    password: 'Ztl2019!',
-  keepalive: 60,
-  clientId: clientId,
-  protocolId: 'MQTT',
-  protocolVersion: 5,
-  clean: true,
-  reconnectPeriod: 1000,
-  connectTimeout: 30 * 1000,
-  will: {
-    topic: 'macherdaach/queue/messageFromPlace',
-    payload: 'Connection Closed abnormally..!',
-    qos: 0,
-    retain: false
-  },
+var undeliveredMessages = [];
+var temperature = 25;
+
+// configure the client to Cumulocity
+var client = new Paho.MQTT.Client(serverUrl, clientId);
+
+// display all incoming messages
+client.onMessageArrived = function (message) {
+    log('Received operation "' + message.payloadString + '"');
+    if (message.payloadString.indexOf("510") == 0) {
+        log("Simulating device restart...");
+        publish("s/us", "501,c8y_Restart");
+        log("...restarting...");
+        setTimeout(function() {
+            publish("s/us", "503,c8y_Restart");
+        }, 1000);
+        log("...done...");
+    }
+};
+
+// display all delivered messages
+client.onMessageDelivered = function onMessageDelivered (message) {
+    log('Message "' + message.payloadString + '" delivered');
+    var undeliveredMessage = undeliveredMessages.pop();
+    if (undeliveredMessage.onMessageDeliveredCallback) {
+        undeliveredMessage.onMessageDeliveredCallback();
+    }
+};
+
+function getStatus () {
+  client.subscribe("macherdaach/queue/messageFromController");
+  client.subscribe("macherdaach/queue/messageFromPlace");
+  console.log('ready');
 }
 
-console.log('Connecting mqtt client')
-const client = mqtt.connect(host, options)
+// send a message
+function publish (topic, message, onMessageDeliveredCallback) {
+    message = new Paho.MQTT.Message(message);
+    message.destinationName = topic;
+    message.qos = 2;
+    undeliveredMessages.push({
+        message: message,
+        onMessageDeliveredCallback: onMessageDeliveredCallback
+    });
+    client.send(message);
+}
 
-client.on('error', (err) => {
-  console.log('Connection error: ', err)
-  client.end()
-})
+// connect the client to Cumulocity
+function init () {
+    client.connect({
+        userName: username,
+        password: password,
+        onSuccess: getStatus
+    });
+}
 
-client.on('reconnect', () => {
-  console.log('Reconnecting...')
-})
-client.on('connect', () => {
-  console.log('Client connected:' + clientId)
-  // Subscribe
-  client.subscribe('macherdaach/queue/messageFromPlace', { qos: 0 })
-})
-client.on('message', (topic, message, packet) => {
-  console.log('Received Message: ' + message.toString() + '\nOn topic: ' + topic)
-})
+// display all messages on the page
+function log (message) {
+    document.getElementById('logger').insertAdjacentHTML('beforeend', '<div>' + message + '</div>');
+}
 
+init();
 function nextUser(){
   
 override = $('#nextnum').val();
 if (override != currentNumber){
-  client.publish('macherdaach/queue/messageFromPlace', 
-{
+message= {
   "new_number":override
-}, { qos: 0, retain: false });
+};
 }else{
-client.publish('macherdaach/queue/messageFromPlace', 
-{
+  message= {
   "new_number":currentNumber
-}, { qos: 0, retain: false });
+};
 currentNumber++;
 }
+publish('macherdaach/queue/messageFromPlace', 
+JSON.stringify(message));
 $('#nextnum').val(currentNumber);
 console.log('NEXT')
 }
-
-  console.log('ready');
+function TableStart(tablenum){
+  message = {
+  "place_number": tablenum,
+  "place_occupied": true
+}
+ publish('macherdaach/queue/messageFromPlace',JSON.stringify(message))
+ $("#table-"+tablenum+'> span').addClass('bg-info');
+}
+function TableEnd(tablenum){
+  message = {
+  "place_number": tablenum,
+  "place_occupied": false
+}
+ publish('macherdaach/queue/messageFromPlace',JSON.stringify(message));
+$("#table-"+tablenum+'> span').removeClass('bg-info');
+}
   
 
     </script>
@@ -102,19 +144,19 @@ console.log('NEXT')
         <div class="container">
           <div class="row g-2">
             
-              <div class="input-group">
+              <div id="table-1" class="input-group">
                 <span class="input-group-text col-6">Arbeitsplatz 1 </span>
                 <button onclick="TableStart(1);" class="btn btn-success col-3">START</button>
                 <button onclick="TableEnd(1);" class="btn btn-danger col-3" >END</button>
               </div>
             
-              <div class="input-group">
+              <div id="table-2" class="input-group">
                 <span class="input-group-text col-6">Arbeitsplatz 2 </span>
                 <button onclick="TableStart(2);" class="btn btn-success col-3">START</button>
                 <button onclick="TableEnd(2);" class="btn btn-danger col-3" >END</button>
               </div>
 
-              <div class="input-group">
+              <div id="table-3" class="input-group">
                 <span class="input-group-text col-6">Arbeitsplatz 3 </span>
                 <button onclick="TableStart(3);" class="btn btn-success col-3">START</button>
                 <button onclick="TableEnd(3);" class="btn btn-danger col-3" >END</button>
@@ -122,30 +164,30 @@ console.log('NEXT')
 
           
 
-              <div class="input-group">
+              <div id="table-4" class="input-group">
                 <span class="input-group-text col-6">Arbeitsplatz 4 </span>
                 <button onclick="TableStart(4);" class="btn btn-success col-3">START</button>
                 <button onclick="TableEnd(4);" class="btn btn-danger col-3" >END</button>
               </div>
 
-              <div class="input-group">
+              <div id="table-5" class="input-group">
                 <span class="input-group-text col-6">Arbeitsplatz 5 </span>
                 <button onclick="TableStart(5);" class="btn btn-success col-3">START</button>
                 <button onclick="TableEnd(5);" class="btn btn-danger col-3" >END</button>
               </div>
-              <div class="input-group">
+              <div id="table-6" class="input-group">
                 <span class="input-group-text col-6">Arbeitsplatz 6 </span>
                 <button onclick="TableStart(6);" class="btn btn-success col-3">START</button>
                 <button onclick="TableEnd(6);" class="btn btn-danger col-3" >END</button>
               </div>
 
-              <div class="input-group">
+              <div id="table-7"class="input-group">
                 <span class="input-group-text col-6">Arbeitsplatz 7 </span>
                 <button onclick="TableStart(7);" class="btn btn-success col-3">START</button>
                 <button onclick="TableEnd(7);" class="btn btn-danger col-3" >END</button>
               </div>
 
-              <div class="input-group">
+              <div id="table-8" class="input-group">
                 <span class="input-group-text col-6">Arbeitsplatz 8 </span>
                 <button onclick="TableStart(8);" class="btn btn-success col-3">START</button>
                 <button onclick="TableEnd(8);" class="btn btn-danger col-3" >END</button>
@@ -157,7 +199,7 @@ console.log('NEXT')
       
       
       
-      <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-debug-tab"></div>
+      <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-debug-tab">
       <div id="logger"></div></div>
     
 </body>
