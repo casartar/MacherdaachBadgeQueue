@@ -64,7 +64,7 @@ class Controller(object):
                     current_processing_time = 0
                 print("time difference: " + str(current_processing_time))
                 if (median_processing_time == 0 or current_processing_time == 0):
-                    element.set_text(list_of_ticket_numbers[count] + "(???)")
+                    element.set_text(str(list_of_ticket_numbers[count]) + "(???)")
                 else:
                     estimated_processing_time = median_processing_time - current_processing_time
                     element.set_text(str(list_of_ticket_numbers[count]) + "(" + str(
@@ -101,7 +101,7 @@ class Controller(object):
         new_number = json_loaded["new_number"]
         print("Received new ticket number from controller: " +
               str(new_number))
-        if new_number < 0:
+        if int(new_number) < 0:
             raise Exception('New ticket number must be positive!')
         # Check if new number is already in use
         for placeInList in self.model.list_of_places:
@@ -109,7 +109,7 @@ class Controller(object):
                 raise Exception("New number " + str(new_number) +
                       " already registered")
                 return
-        if new_number in self.model.list_of_ticket_numbers:
+        if int(new_number) in self.model.list_of_ticket_numbers:
             print("New number " + str(new_number) +
                   "already in ticket number list")
             return
@@ -138,7 +138,7 @@ class Controller(object):
             if self.model.list_of_places[place_number].state == PlaceState.REGISTERED:
                 self.occupyPlace(place_number)
             else:
-                raise Exception("Not occupied - there is no ticket registered to this place")
+                raise Exception("Cannot Occupy - ????")
         if json_loaded["place_occupied"] == False:
             # Place was given up by owner
             print("Released: " +
