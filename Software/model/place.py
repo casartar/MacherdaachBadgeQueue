@@ -26,7 +26,7 @@ class Place:
         self.state = PlaceState.REGISTERED
 
     def set_place_state_to_occupied(self):
-        if self.state == PlaceState.FREE:
+        if self.state == PlaceState.REGISTERED:
             self.state = PlaceState.OCCUPIED
         else:
             raise Exception('Can only occupy free place.')

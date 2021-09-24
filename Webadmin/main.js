@@ -1,7 +1,7 @@
 
         // Globally initializes an mqtt variable
         const clientId = 'webadmin_' + Math.random().toString(16).substr(2, 8)
-currentNumber = 0
+currentNumber = 1
 const host = 'ws://ztl@ztl-mqtt.westeurope.azurecontainer.io:15675/ws'
 var serverUrl   = 'ws://ztl@ztl-mqtt.westeurope.azurecontainer.io:15675/ws';     /* wss://mqtt.cumulocity.com/mqtt for a secure connection */
 var device_name = "Webadmin";
@@ -9,7 +9,7 @@ var username    = "ztl";
 var password    = "Ztl2019!";
 
 var undeliveredMessages = [];
-var temperature = 25;
+
 
 // configure the client to Cumulocity
 var client = new Paho.MQTT.Client(serverUrl, clientId);
@@ -17,15 +17,7 @@ var client = new Paho.MQTT.Client(serverUrl, clientId);
 // display all incoming messages
 client.onMessageArrived = function (message) {
     log('Received operation "' + message.payloadString + '"');
-    if (message.payloadString.indexOf("510") == 0) {
-        log("Simulating device restart...");
-        publish("s/us", "501,c8y_Restart");
-        log("...restarting...");
-        setTimeout(function() {
-            publish("s/us", "503,c8y_Restart");
-        }, 1000);
-        log("...done...");
-    }
+   
 };
 
 // display all delivered messages
@@ -55,13 +47,23 @@ function publish (topic, message, onMessageDeliveredCallback) {
     client.send(message);
 }
 
-// connect the client to Cumulocity
+function onConnectionLost(resObj) {
+    console.log("Lost connection to " + resObj.uri + "\nError code: " + resObj.errorCode + "\nError text: " + resObj.errorMessage);
+    if (resObj.reconnect) {
+        console.log("Automatic reconnect is currently active.");
+    } else {
+        alert("Lost connection to host.");
+    }
+}
 function init () {
     client.connect({
         userName: username,
         password: password,
-        onSuccess: getStatus
+        onSuccess: getStatus,
+        keepAliveInterval: 30, 
+       
     });
+    client.onConnectionLost = onConnectionLost;
 }
 
 // display all messages on the page
@@ -83,7 +85,7 @@ message= {
 };
 currentNumber++;
 }
-publish('macherdaach/queue/messageFromPlace', 
+publish('macherdaach/queue/messageFromController', 
 JSON.stringify(message));
 $('#nextnum').val(currentNumber);
 console.log('NEXT')
